@@ -12,6 +12,7 @@ namespace GymManagementPL.Controllers
         {
             memberService = _memberService;
         }
+
         #region Get All Members
 
         public ActionResult Index()
@@ -114,16 +115,16 @@ namespace GymManagementPL.Controllers
         }
 
         [HttpPost]
-        public ActionResult MemberEdit(  [FromRoute] int Memberid , MemberToUpdateViewModel UpdatedMember )
+        public ActionResult MemberEdit([FromRoute] int id, MemberToUpdateViewModel UpdatedMember)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 TempData["ErrorMessage"] = "Check The Data";
                 //return View(nameof(MemberEdit) , UpdatedMember);
-                return View( UpdatedMember);
+                return View(UpdatedMember);
             }
 
-            var result = memberService.UpdateMemberDetails(Memberid , UpdatedMember);
+            var result = memberService.UpdateMemberDetails(id, UpdatedMember);
 
             if (result)
             {

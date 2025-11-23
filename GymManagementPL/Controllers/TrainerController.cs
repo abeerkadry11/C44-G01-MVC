@@ -23,7 +23,7 @@ namespace GymManagementPL.Controllers
         #endregion
 
         #region Get Trainer Data
-
+        // Get : Trainer/Details/5
         public ActionResult TrainerDetails(int id)
         {
             if (id <= 0)
@@ -44,11 +44,13 @@ namespace GymManagementPL.Controllers
 
         #region Create Trainer
 
+        // Get : Trainer/Create
         public ActionResult Create()
         {
             return View();
         }
 
+        // Post : Trainer/Create
         [HttpPost]
         public ActionResult CreateConfirmed(CreateTrainerViewModel createdTrainer)
         {

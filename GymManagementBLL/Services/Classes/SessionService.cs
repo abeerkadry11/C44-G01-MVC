@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GymManagementBLL.Services.Interfaces;
+using GymManagementBLL.ViewModels.SessionViewModels;
 using GymManagementDAL.Entities;
 using GymManagementDAL.Repositories.Interfaces;
 using GymManagementSystemBLL.ViewModels.SessionViewModels;
@@ -153,7 +154,17 @@ namespace GymManagementBLL.Services.Classes
 
         }
 
+        public IEnumerable<TrainerSelectViewModel> GetTrainersForDropDown()
+        {
+            var Trainers = unitOfWork.GetRepository<Trainer>().GetAll();
+            return mapper.Map<IEnumerable<TrainerSelectViewModel>>(Trainers);
+        }
 
+        public IEnumerable<CategorySelectViewModel> GetCategoriesForDropDown()
+        {
+            var Categories = unitOfWork.GetRepository<Category>().GetAll();
+            return mapper.Map<IEnumerable<CategorySelectViewModel>>(Categories);
+        }
 
 
         #region Helper Method
@@ -168,7 +179,7 @@ namespace GymManagementBLL.Services.Classes
         }
         private bool IsValidTime(DateTime Start, DateTime End)
         {
-            return Start < End;
+            return (End > Start );
         }
 
         private bool IsSessionAvailableToUpdate(Session session)
@@ -181,9 +192,12 @@ namespace GymManagementBLL.Services.Classes
             // Use Count Of Bookings
             var HasActiveBookings = unitOfWork.sessionRepository.GetCountOfBookingSlots(session.Id) > 0;
             if (HasActiveBookings) return false;
-
             return true;
 
+            // --------------
+
+            //return session.CreatedAt > DateTime.Now && 
+                //unitOfWork.sessionRepository.GetCountOfBookingSlots(session.Id) == 0;
         }
         private bool IsSessionAvailableToRemove(Session session)
         {
@@ -201,6 +215,8 @@ namespace GymManagementBLL.Services.Classes
             return true;
 
         }
+
+  
 
 
         #endregion
