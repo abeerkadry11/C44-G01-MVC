@@ -4,18 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GymManagementDAL.Entities
+namespace GymManagementBLL.ViewModels.PlanViewModels
 {
-    public class Plan : BaseEntity
+    public class PlanViewModel
     {
-        public string Name { get; set; } = null!;   
+        public int Id { get; set; }
+        public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
         public int DurationDays { get; set; }
-        public decimal Price { get; set; }
+        public decimal Price  { get; set; }
         public bool IsActive { get; set; }
-
-        public ICollection<MemberShip> PlanMembers { get; set; } = null!;
-
-
     }
 }
