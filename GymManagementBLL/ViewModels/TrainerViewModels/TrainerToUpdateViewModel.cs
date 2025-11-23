@@ -8,15 +8,10 @@ using System.Threading.Tasks;
 
 namespace GymManagementBLL.ViewModels.TrainerViewModels
 {
-    public class CreateTrainerViewModel
+    public class TrainerToUpdateViewModel
     {
         #region MyCode
 
-        //[Required(ErrorMessage = "Id Is Required")]
-        //public int Id { get; set; }
-
-        //[Required(ErrorMessage = "Name Is Required")]
-        //[StringLength(maximumLength:50 , MinimumLength = 2 , ErrorMessage = "Must Between 2 and 50")]
         //public string Name { get; set; } = null!;
 
         //[Required(ErrorMessage = "Specialty Is Required")]
@@ -35,14 +30,6 @@ namespace GymManagementBLL.ViewModels.TrainerViewModels
         //[StringLength(maximumLength: 15, MinimumLength = 10, ErrorMessage = " Phone Must Between 10 And 15")]
         //public string Phone { get; set; } = null!;
 
-        //[Required(ErrorMessage = "Date Of Birth Is Required")]
-        //[DataType(DataType.Date)]
-        //public DateOnly DateOfBirth { get; set; }
-
-
-        //[Required(ErrorMessage = "Gender Is Required")]
-        //public Gender Gender { get; set; }
-
         //[Required(ErrorMessage = "BuildingNumber Is Required")]
         //[Range(1, 9000, ErrorMessage = " BuildingNumber Must Be Between 1 and 9000")]
         //public int BuildingNumber { get; set; }
@@ -54,12 +41,9 @@ namespace GymManagementBLL.ViewModels.TrainerViewModels
         //[Required(ErrorMessage = "City Is Required")]
         //[StringLength(30, MinimumLength = 2, ErrorMessage = " City Must Be Between 2 and 30")]
         //[RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = " City Contains Letters And Spaces Only")]
-        //public string City { get; set; } = null!;
-
+        //public string City { get; set; } = null!; 
         #endregion
 
-        [Required(ErrorMessage = "Name Is Required")]
-        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Name can only contain letters and spaces")]
         public string Name { get; set; } = null!;
 
         [Required(ErrorMessage = "Email Is Required")]
@@ -72,13 +56,6 @@ namespace GymManagementBLL.ViewModels.TrainerViewModels
         [RegularExpression(@"^(010|011|012|015)\d{8}$", ErrorMessage = "Phone number must be a valid Egyptian mobile number")]
 
         public string Phone { get; set; } = null!;
-
-        [Required(ErrorMessage = "Date of Birth is required")]
-        [DataType(DataType.Date)]
-        public DateOnly DateOfBirth { get; set; }
-
-        [Required(ErrorMessage = "Gender is required")]
-        public Gender Gender { get; set; }
 
         [Required(ErrorMessage = "Building Number Is Required")]
         [Range(1, int.MaxValue, ErrorMessage = "Building Number must be greater than 0")]
@@ -95,8 +72,6 @@ namespace GymManagementBLL.ViewModels.TrainerViewModels
         public string Street { get; set; } = null!;
 
         [Required(ErrorMessage = "Specialty is Required")]
-        [EnumDataType(typeof(Specialties))]
         public Specialties Specialties { get; set; }
-
     }
 }

@@ -23,6 +23,7 @@ namespace GymManagementPL.Controllers
 
             //return View("ViewName");// return Another View With Specific Name
             //return View("Hamada", Data); // return Another View With Specific Name with Passing Model
+
         }
 
     }

@@ -28,7 +28,7 @@ namespace GymManagementDAL.Data.Configurations
             builder.ToTable(T =>
             {
                 T.HasCheckConstraint("EmailCheck", "[Email] like '_%@_%._%'");
-                T.HasCheckConstraint("PhoneCheck", "[Phone] like '01' and Phone Not Like '%[^0-9]%' ");
+                T.HasCheckConstraint("PhoneCheck", "[Phone] LIKE '01%' AND [Phone] NOT LIKE '%[^0-9]%'");
 
             }
             );
