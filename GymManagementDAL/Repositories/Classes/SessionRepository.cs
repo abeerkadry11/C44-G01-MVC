@@ -1,6 +1,7 @@
 ﻿using GymManagementDAL.Data.Contexts;
 using GymManagementDAL.Entities;
 using GymManagementDAL.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,35 +10,34 @@ using System.Threading.Tasks;
 
 namespace GymManagementDAL.Repositories.Classes
 {
-    public class SessionRepository : ISessionRepository
+    public class SessionRepository : GenericRepository<Session>, ISessionRepository
     {
-
         private readonly GymDbContext dbContext;
 
-        public SessionRepository(GymDbContext dbContext)
+        public SessionRepository(GymDbContext _dbContext) : base(_dbContext)
         {
-            this.dbContext = dbContext;
-        }
-        public int Add(Session session)
-        {
-            dbContext.Sessions.Add(session);
-            return dbContext.SaveChanges();
+            dbContext = _dbContext;
         }
 
-        public int Delete(Session session)
+
+        public IEnumerable<Session> GetAllSessionsWithTrainerAndCategory()
         {
-            dbContext.Sessions.Remove(session);
-            return dbContext.SaveChanges();
+            return dbContext.Sessions.Include(S => S.SessionTrainer)
+                                     .Include(S => S.SessionCategory)
+                                     .ToList();
         }
 
-        public IEnumerable<Session> GetAll() => dbContext.Sessions.ToList();
-
-        public Session? GetById(int Id) => dbContext.Sessions.Find(Id);
-
-        public int Update(Session session)
+        public int GetCountOfBookingSlots(int SessionId)
         {
-            dbContext.Sessions.Update(session);
-            return dbContext.SaveChanges();
+            return dbContext.MemberSessions.Count(X => X.SessionId == SessionId);
+        }
+
+        public Session? GetSessionWithTrainerAndCategory(int sessionId)
+        {
+            return dbContext.Sessions
+                            .Include(X => X.SessionTrainer)
+                            .Include(X => X.SessionCategory)
+                            .FirstOrDefault(X => X.Id == sessionId);
         }
     }
 }

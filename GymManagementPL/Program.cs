@@ -1,4 +1,8 @@
+using GymManagementBLL;
+using GymManagementBLL.Services.Classes;
+using GymManagementBLL.Services.Interfaces;
 using GymManagementDAL.Data.Contexts;
+using GymManagementDAL.Data.DataSeed;
 using GymManagementDAL.Repositories.Classes;
 using GymManagementDAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -21,11 +25,42 @@ namespace GymManagementPL
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
-            builder.Services.AddScoped<ITrainerRepository, TrainerRepository>();
+            ////builder.Services.AddScoped<ITrainerRepository, TrainerRepository>();
+            //builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            //builder.Services.AddScoped<IPlanRepository, PlanRepository>();
+
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+            builder.Services.AddAutoMapper(X => X.AddProfile(new MappingProfiles()));
+            // Or
+            //builder.Services.AddAutoMapper(X => X.AddProfile<MappingProfiles>());
+            builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+
+
+
 
 
             var app = builder.Build();
 
+            #region Migrate DataBase - Data Seeding
+
+            using var Scope = app.Services.CreateScope();
+            var dbContext = Scope.ServiceProvider.GetRequiredService<GymDbContext>();
+
+            var PendingMigrations = dbContext.Database.GetPendingMigrations();
+            if (PendingMigrations?.Any() ?? false)
+            {
+                dbContext.Database.Migrate();
+            }
+            GymDbContextSeeding.SeedData(dbContext);
+
+            #endregion
+
+
+
+
+
+             
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
@@ -40,6 +75,14 @@ namespace GymManagementPL
             app.UseAuthorization();
 
             app.MapStaticAssets();
+            app.MapControllerRoute(
+                name: "Trainers",
+                pattern: "coach/{action}",
+                defaults: new { controller = "Trainer", action = "Index" });
+
+
+
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")

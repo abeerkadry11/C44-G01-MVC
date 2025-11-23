@@ -7,12 +7,14 @@ using System.Threading.Tasks;
 
 namespace GymManagementDAL.Repositories.Interfaces
 {
-    public interface ISessionRepository
+    // ISessionRepository Has 7 Signatures
+    // 5 From IGenericRepository 
+    // 2 From ISessionRepository
+    public interface ISessionRepository : IGenericRepository<Session>
     {
-        IEnumerable<Session> GetAll();
-        Session? GetById(int Id);
-        int Add(Session session);
-        int Update(Session session );
-        int Delete(Session session);
+        IEnumerable<Session> GetAllSessionsWithTrainerAndCategory();
+        int GetCountOfBookingSlots(int SessionId);
+
+        Session? GetSessionWithTrainerAndCategory(int sessionId);
     }
 }
