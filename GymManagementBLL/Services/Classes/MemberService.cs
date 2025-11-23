@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GymManagementBLL.Services.AttachmentService;
 using GymManagementBLL.Services.Interfaces;
 using GymManagementBLL.ViewModels.MemberViewModels;
 using GymManagementDAL.Data.Contexts;
@@ -16,6 +17,7 @@ namespace GymManagementBLL.Services.Classes
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
+        private readonly IAttachmentService attachmentService;
         #region Without UnitOfWork
         //private readonly IGenericRepository<Member> memberRepository;
         //private readonly IGenericRepository<MemberShip> memberShipRepository;
@@ -41,10 +43,11 @@ namespace GymManagementBLL.Services.Classes
 
         #endregion
 
-        public MemberService(IUnitOfWork _unitOfWork , IMapper _mapper)
+        public MemberService(IUnitOfWork _unitOfWork, IMapper _mapper, IAttachmentService _attachmentService)
         {
             unitOfWork = _unitOfWork;
             mapper = _mapper;
+            attachmentService = _attachmentService;
         }
 
 
@@ -67,17 +70,30 @@ namespace GymManagementBLL.Services.Classes
                 //var PhoneExists = memberRepository.GetAll(m => m.Phone == createMemberViewModel.Phone).Any();
                 //if (PhoneExists || EmailExists) return false;
 
-                if (IsEmailExists(createMemberViewModel.Email , createMemberViewModel.Name) || IsPhoneExists(createMemberViewModel.Phone , createMemberViewModel.Name)) return false;
+                if (IsEmailExists(createMemberViewModel.Email, createMemberViewModel.Name) || IsPhoneExists(createMemberViewModel.Phone, createMemberViewModel.Name)) return false;
+
+                var PhotoName = attachmentService.Upload("members", createMemberViewModel.PhotoFile);
+                if (string.IsNullOrEmpty(PhotoName)) return false;
 
 
                 var member = mapper.Map<Member>(createMemberViewModel);
+                member.Photo = PhotoName;
+
 
                 // Add Member To Database
                 unitOfWork.GetRepository<Member>().Add(member); // Added Locally
                 // return memberRepository.Add(member) > 0 ;
-                return unitOfWork.SaveChanges() > 0;
+                var IsCreated = unitOfWork.SaveChanges() > 0;
+                if (!IsCreated)
+                {
+                    // Rollback Photo
+                    attachmentService.Delete(PhotoName, "members");
+                    return false;
+                }
+                return IsCreated;
+
             }
-            catch   
+            catch
             {
                 return false;
             }
@@ -188,7 +204,7 @@ namespace GymManagementBLL.Services.Classes
             // And The Start Date Of The Session <= Now 
 
             var SessionIds = unitOfWork.GetRepository<MemberSession>()
-                .GetAll(ms => ms.MemberId == MemberId).Select(X=>X.SessionId); // 1 2 9
+                .GetAll(ms => ms.MemberId == MemberId).Select(X => X.SessionId); // 1 2 9
 
             var HasFutureSessions = unitOfWork.GetRepository<Session>()
                 .GetAll(X => SessionIds.Contains(X.Id) && X.CreatedAt > DateTime.Now).Any();
@@ -208,7 +224,12 @@ namespace GymManagementBLL.Services.Classes
                     }
                 }
                 MemberRepo.Delete(Member);
-                return unitOfWork.SaveChanges() > 0;
+                var IsDeleted = unitOfWork.SaveChanges() > 0;
+                if (IsDeleted)
+                    attachmentService.Delete(Member.Photo, "members");
+
+                return IsDeleted;
+
             }
             catch
             {
@@ -220,11 +241,11 @@ namespace GymManagementBLL.Services.Classes
 
         #region Helper Methods
 
-        private bool IsEmailExists(string email , string name )
+        private bool IsEmailExists(string email, string name)
         {
             return unitOfWork.GetRepository<Member>().GetAll(m => m.Email == email && m.Name != name).Any();
         }
-        private bool IsPhoneExists(string phone , string name)
+        private bool IsPhoneExists(string phone, string name)
         {
             return unitOfWork.GetRepository<Member>().GetAll(m => m.Phone == phone && m.Name != name).Any();
         }

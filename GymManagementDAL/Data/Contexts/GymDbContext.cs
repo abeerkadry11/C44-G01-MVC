@@ -1,4 +1,6 @@
 ﻿using GymManagementDAL.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace GymManagementDAL.Data.Contexts
 {
-    public class GymDbContext : DbContext
+    public class GymDbContext : IdentityDbContext<ApplicationUser>
     {
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
@@ -23,7 +25,19 @@ namespace GymManagementDAL.Data.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+            modelBuilder.Entity<ApplicationUser>(Eb =>
+            {
+                Eb.Property(X => X.FirstName)
+                .HasColumnType("varchar")
+                .HasMaxLength(50);
+                Eb.Property(X => X.LastName)
+                .HasColumnType("varchar")
+                .HasMaxLength(50);
+
+
+            });
         }
 
         #region DbSets
@@ -35,6 +49,10 @@ namespace GymManagementDAL.Data.Contexts
         public DbSet<Session> Sessions { get; set; }
         public DbSet<MemberShip> MemberShips{ get; set; }
         public DbSet<MemberSession> MemberSessions { get; set; }
+
+        //public DbSet<ApplicationUser>  Users { get; set; }
+        //public DbSet<IdentityRole> Roles { get; set; }
+        //public DbSet<IdentityUserRole<string>> UserRoles{ get; set; }
 
         #endregion
 
